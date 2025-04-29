@@ -9,7 +9,28 @@
 </head>
 <body>
     <h1>Your books</h1>
+    <button class="add">Add</button>
+
+    <dialog>
+        <div class="dialog-content">
+            <button class="close">X</button>
+            <div class="dialog-title">Add Book</div>
+            <form method="dialog">
+                <label for="title">Title: </label>
+                <input id="title" type="text" required>
+                <label for="author">Author: </label>
+                <input id="author" type="text" required>
+                <label for="pages">Nb Pages: </label>
+                <input id="pages" type="number" value="0">
+                <label for="read">Finished reading: </label>
+                <input id="read" type="checkbox">
+                <button class="submit">Done</button>
+            </form>
+        </div>
+    </dialog>
+
     <div class="container">
+
     </div>
 </body>
 </html>

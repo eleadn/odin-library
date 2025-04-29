@@ -32,6 +32,11 @@ function createBook(title, author, pages, isRead)
 
 function displayBooks()
 {
+    while (cardContainers.hasChildNodes())
+    {
+        cardContainers.removeChild(cardContainers.firstChild);
+    }
+
     myLibrary.forEach(item =>
     {
         const card = document.createElement("div");
@@ -52,6 +57,48 @@ function displayBooks()
         cardContainers.appendChild(card);
     })
 }
+
+const dialog = document.querySelector("dialog");
+const closeModal = document.querySelector(".close");
+const form = document.querySelector("form");
+const addButton = document.querySelector(".add");
+const submitButton = document.querySelector(".submit");
+
+const titleForm = document.querySelector("#title");
+const authorForm = document.querySelector("#author");
+const pagesForm = document.querySelector("#pages");
+const readForm = document.querySelector("#read");
+
+addButton.addEventListener("click", () => dialog.showModal());
+
+closeModal.addEventListener("click", () =>
+{
+    form.reset();
+    dialog.close();
+});
+
+dialog.addEventListener("close", event => 
+{
+    if (!(event.target.returnValue === "true"))
+    {
+        return;
+    }
+
+    createBook(titleForm.value, authorForm.value, pagesForm.value, readForm.checked);
+    displayBooks();
+    form.reset();
+});
+
+submitButton.addEventListener("click", event => 
+{
+    if (!form.checkValidity())
+    {
+        return;
+    }
+    event.preventDefault();
+    dialog.close(true);
+});
+
 
 createBook("The Hobbit", "J.R.R. Tolkien", 295, false);
 createBook("One Flew Over the Cuckoo's Nest", "Ken Kesey", 291, true);

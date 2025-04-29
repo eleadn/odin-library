@@ -1,5 +1,5 @@
 const onErrorNewNotUsedConstructor = "A constructor should be called using the 'new' keyword.";
-const myLibrary = [];
+let myLibrary = [];
 const cardContainers = document.querySelector('.container');
 
 function Book(title, author, pages, isRead)
@@ -49,7 +49,16 @@ function displayBooks()
         pages.textContent = `${item.book.pages} pages`;
         const readStatus = document.createElement("div");
         readStatus.textContent = item.book.isRead ? "Finished reading" : "Not read yet";
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "X";
+        removeBtn.dataset.id = item.id;
+        removeBtn.addEventListener("click", event =>
+        {
+            myLibrary = myLibrary.filter((value, __, _) => value.id != event.target.dataset.id);
+            displayBooks();
+        });
 
+        card.appendChild(removeBtn);
         card.appendChild(name);
         card.appendChild(author);
         card.appendChild(pages);

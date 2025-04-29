@@ -21,6 +21,11 @@ Book.prototype.info = function()
     return `${this.title} by ${this.author}, ${this.pages} pages, ${readStatus}`;
 }
 
+Book.prototype.switchReadStatus = function()
+{
+    this.isRead = !this.isRead;
+}
+
 function createBook(title, author, pages, isRead)
 {
     myLibrary.push(
@@ -40,6 +45,7 @@ function displayBooks()
     myLibrary.forEach(item =>
     {
         const card = document.createElement("div");
+        card.dataset.id = item.id;
         card.classList.add("card");
         const name = document.createElement("h2");
         name.textContent = item.book.title;
@@ -51,10 +57,16 @@ function displayBooks()
         readStatus.textContent = item.book.isRead ? "Finished reading" : "Not read yet";
         const removeBtn = document.createElement("button");
         removeBtn.textContent = "X";
-        removeBtn.dataset.id = item.id;
         removeBtn.addEventListener("click", event =>
         {
-            myLibrary = myLibrary.filter((value, __, _) => value.id != event.target.dataset.id);
+            myLibrary = myLibrary.filter((value, __, _) => value.id != event.target.parentNode.dataset.id);
+            displayBooks();
+        });
+        const switchReadBtn = document.createElement("button");
+        switchReadBtn.textContent = "Switch Read Status";
+        switchReadBtn.addEventListener("click", event =>
+        {
+            myLibrary.find((value, __, _) => value.id == event.target.parentNode.dataset.id).book.switchReadStatus();
             displayBooks();
         });
 
@@ -63,6 +75,7 @@ function displayBooks()
         card.appendChild(author);
         card.appendChild(pages);
         card.appendChild(readStatus);
+        card.appendChild(switchReadBtn);
         cardContainers.appendChild(card);
     })
 }
@@ -110,6 +123,5 @@ submitButton.addEventListener("click", event =>
 
 
 createBook("The Hobbit", "J.R.R. Tolkien", 295, false);
-createBook("One Flew Over the Cuckoo's Nest", "Ken Kesey", 291, true);
 
 displayBooks();

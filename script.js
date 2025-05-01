@@ -1,48 +1,75 @@
-const onErrorNewNotUsedConstructor = "A constructor should be called using the 'new' keyword.";
-let myLibrary = [];
 const cardContainers = document.querySelector('.container');
 
-function Book(title, author, pages, isRead)
+class Book
 {
-    if (!new.target)
+    #title;
+    #author;
+    #pages;
+    #isRead;
+
+    constructor(title, author, pages, isRead)
     {
-        throw error(onErrorNewNotUsedConstructor)
+        this.#title = title;
+        this.#author = author;
+        this.#pages = pages;
+        this.#isRead = isRead;
     }
 
-    this.title = title;
-    this.author = author;
-    this.pages = pages;
-    this.isRead = isRead;
+    get informations()
+    {
+        const readStatus = this.#isRead ? "finished reading" : "not read yet";
+        return `${this.#title} by ${this.#author}, ${this.#pages} pages, ${readStatus}`;
+    }
+
+    get title() { return this.#title; }
+    get author() { return this.#author; }
+    get pages() { return this.#pages; }
+    get isRead() { return this.#isRead; }
+
+    switchReadStatus()
+    {
+        this.#isRead = !this.#isRead;
+    }
 }
 
-Book.prototype.info = function()
+class Library
 {
-    const readStatus = this.isRead ? "finished reading" : "not read yet";
-    return `${this.title} by ${this.author}, ${this.pages} pages, ${readStatus}`;
+    #books;
+
+    constructor(...books)
+    {
+        this.#books = Array.from([...books]).map((book, _, __) => { id: crypto.randomUUID, book });
+    }
+
+    addBook(book)
+    {
+        this.#books.push({ id: crypto.randomUUID(), book });
+    }
+
+    removeBook(bookId)
+    {
+        this.#books = this.#books.filter((book, _, __) => book.id != bookId);
+    }
+
+    switchReadStatus(bookId)
+    {
+        this.#books.find((book, _, __) => book.id === bookId).book.switchReadStatus();
+    }
+
+    get getBooks()
+    {
+        return this.#books;
+    }
 }
 
-Book.prototype.switchReadStatus = function()
-{
-    this.isRead = !this.isRead;
-}
-
-function createBook(title, author, pages, isRead)
-{
-    myLibrary.push(
-        {
-            id: crypto.randomUUID(),
-            book: new Book(title, author, pages, isRead),
-        });
-}
-
-function displayBooks()
+function displayBooks(library)
 {
     while (cardContainers.hasChildNodes())
     {
         cardContainers.removeChild(cardContainers.firstChild);
     }
 
-    myLibrary.forEach(item =>
+    library.getBooks.forEach(item =>
     {
         const card = document.createElement("div");
         card.dataset.id = item.id;
@@ -59,15 +86,15 @@ function displayBooks()
         removeBtn.textContent = "X";
         removeBtn.addEventListener("click", event =>
         {
-            myLibrary = myLibrary.filter((value, __, _) => value.id != event.target.parentNode.dataset.id);
-            displayBooks();
+            library.removeBook(event.target.parentNode.dataset.id);
+            displayBooks(library);
         });
         const switchReadBtn = document.createElement("button");
         switchReadBtn.textContent = "Switch Read Status";
         switchReadBtn.addEventListener("click", event =>
         {
-            myLibrary.find((value, __, _) => value.id == event.target.parentNode.dataset.id).book.switchReadStatus();
-            displayBooks();
+            library.switchReadStatus(event.target.parentNode.dataset.id);
+            displayBooks(library);
         });
 
         card.appendChild(removeBtn);
@@ -79,6 +106,8 @@ function displayBooks()
         cardContainers.appendChild(card);
     })
 }
+
+const library = new Library();
 
 const dialog = document.querySelector("dialog");
 const closeModal = document.querySelector(".close");
@@ -106,8 +135,8 @@ dialog.addEventListener("close", event =>
         return;
     }
 
-    createBook(titleForm.value, authorForm.value, pagesForm.value, readForm.checked);
-    displayBooks();
+    library.addBook(new Book(titleForm.value, authorForm.value, pagesForm.value, readForm.checked));
+    displayBooks(library);
     form.reset();
 });
 
@@ -121,7 +150,6 @@ submitButton.addEventListener("click", event =>
     dialog.close(true);
 });
 
+library.addBook(new Book("The Hobbit", "J.R.R. Tolkien", 295, false));
 
-createBook("The Hobbit", "J.R.R. Tolkien", 295, false);
-
-displayBooks();
+displayBooks(library);
